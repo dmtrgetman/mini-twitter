@@ -1,5 +1,8 @@
 class User < ApplicationRecord
-  has_many :microposts, dependent: :destroy
+  # has_many :microposts, dependent: :destroy
+  has_many :microposts, class_name: "Micropost",
+                        foreign_key: "user_id",
+                        dependent: :destroy
   has_many :active_relationships, class_name:  "Relationship",
                                   foreign_key: "follower_id",
                                   dependent:   :destroy
@@ -9,6 +12,7 @@ class User < ApplicationRecord
                                    dependent:   :destroy
   has_many :following, through: :active_relationships,  source: :followed
   has_many :followers, through: :passive_relationships, source: :follower
+  
   attr_accessor :remember_token
   before_save { self.email = email.downcase }
   validates :name,  presence: true, length: { maximum: 50 }
@@ -30,6 +34,14 @@ class User < ApplicationRecord
   def self.new_token #like Users.new_token
     SecureRandom.urlsafe_base64
   end
+
+  # def follow
+  #   all_following = []
+  #   self.active_relationships.each do |relation|
+  #     all_following << relation.followed
+  #   end
+  #   all_following
+  # end
 
   # Remembers a user in the database for use in persistent sessions.
   def remember
